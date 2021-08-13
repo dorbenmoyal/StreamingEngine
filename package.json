@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/dorbenmoyal/StreamingEngine/issues"
   },
-  "homepage": "https://github.com/dorbenmoyal/StreamingEngine#readme"
+  "homepage": "https://github.com/dorbenmoyal/StreamingEngine#readme",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "npmlog": "^5.0.0",
+    "prompt-sync": "^4.2.0",
+    "rxjs": "^7.3.0"
+  },
+  "type": "module"
 }
