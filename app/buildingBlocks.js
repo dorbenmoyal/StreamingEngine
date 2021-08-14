@@ -1,13 +1,15 @@
 
 import { defer } from 'rxjs';
-import { map,filter } from 'rxjs/operators';
+import { map,filter,bufferCount, tap } from 'rxjs/operators';
 import events from 'events';
+import _ from 'lodash';
+import {median} from './utils/utils.js';
 export var em = new events.EventEmitter();
-import {config,buildingBlocksTypes} from './config.js';
+import {config,buildingBlocksTypes,eventsTypes} from './config.js';
 
 /**
  * Custom filter function 
- * This function gets a filter function and rise event an event when filter function returns false
+ * This function gets a filter function and rise event when filter function returns false
  * @filterFunc - filter function
  * @event  - event
  */
@@ -26,7 +28,7 @@ export const customFilter = (filterFunc,event) => {
 
 /**
  * Custom fixed-event-window function 
- * This function gets a window size and caller and emit event if window is not full
+ * This function gets a window size and event and emit event if window is not full
  * @filterFunc - filter function
  * @event  - event
  */
@@ -47,31 +49,46 @@ export const customFilter = (filterFunc,event) => {
     })
 }
 
-export function ff(){
-    let subjects = [];
-    config.pipline.forEach(f=>{
-       
+/**
+ * Read pipes from configuration (order is important)
+ * @returns  - piplines list
+ */
+export function getPipes(){
+    let piplines = [];
+    config.pipline.forEach(p=>{
+        const block = getBuildingBlock(p);
+        if(Array.isArray(block))
+            block.forEach(b=>piplines.push(b))
+        else
+            piplines.push(block);
+            
     });
+    return piplines;
 }
 
-export function getBlock(block){
+/**
+ * Gets block type and return the pipe
+ * @blockType - blockType with params (if have)
+ * @returns  - piplines list
+ */
+export function getBuildingBlock(blockType){
 
-    switch (block[0]) {
+    switch (blockType[0]) {
         case buildingBlocksTypes.FILER:
-            return new fixedEventWindow();
+            return  customFilter(blockType[1],eventsTypes.COMMANDPROMPTINPUT);
             break;
         case buildingBlocksTypes.EVENTWINDOW:
-        
+            return  [fixedEventWindow(blockType[1],eventsTypes.COMMANDPROMPTINPUT),bufferCount(blockType[1])];
             break;
         case buildingBlocksTypes.FOLDSUM:
-        
+            return map((x) => _.sum(x));
             break;
         case buildingBlocksTypes.FOLDMEDIAN:
-    
+            return map((x) => median(x));
             break;
 
         case buildingBlocksTypes.STDOUTSINK:
-
+                    return tap(console.log);
             break;
     
         default:
