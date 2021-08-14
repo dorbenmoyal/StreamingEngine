@@ -3,6 +3,7 @@ import { defer } from 'rxjs';
 import { map,filter } from 'rxjs/operators';
 import events from 'events';
 export var em = new events.EventEmitter();
+import {config,buildingBlocksTypes} from './config.js';
 
 /**
  * Custom filter function 
@@ -44,4 +45,36 @@ export const customFilter = (filterFunc,event) => {
             }),
         )
     })
+}
+
+export function ff(){
+    let subjects = [];
+    config.pipline.forEach(f=>{
+       
+    });
+}
+
+export function getBlock(block){
+
+    switch (block[0]) {
+        case buildingBlocksTypes.FILER:
+            return new fixedEventWindow();
+            break;
+        case buildingBlocksTypes.EVENTWINDOW:
+        
+            break;
+        case buildingBlocksTypes.FOLDSUM:
+        
+            break;
+        case buildingBlocksTypes.FOLDMEDIAN:
+    
+            break;
+
+        case buildingBlocksTypes.STDOUTSINK:
+
+            break;
+    
+        default:
+            break;
+    }
 }

@@ -4,7 +4,7 @@ import { isUserInputValid } from './validation/validator.js';
 import {median} from './utils/utils.js';
 import { Observable, Subject} from 'rxjs';
 import { bufferCount, map } from 'rxjs/operators';
-import { customFilter, em, fixedEventWindow } from './buildingBlocks.js';
+import { customFilter, em, fixedEventWindow ,ff} from './buildingBlocks.js';
 import _ from 'lodash';
 
 const prompt = promptSync();
@@ -13,6 +13,7 @@ const stdinSource = new Subject();
 
 
 function applicationStart() {
+    ff();
     initiatePipeLine();
     getUserInputNumber();
 }
@@ -39,7 +40,7 @@ function initiatePipeLine() {
     let fixedEventWindowPipe1 = fixedEventWindow1.pipe(fixedEventWindow(2,'CommandPromptEvent'),bufferCount(2));
     let sum1 = new Subject().pipe(map((x) => _.sum(x)));
     let fixedEventWindow2 = new Subject();
-    let fixedEventWindowPipe2 = fixedEventWindow2.pipe(fixedEventWindow(3,'CommandPromptEvent'),bufferCount(3));
+    let fixedEventWindowPipe2 = fixedEventWindow2.pipe(fixedEventWindow(10,'CommandPromptEvent'),bufferCount(10));
     let medianSubject = new Subject().pipe(map((x) => median(x)));
     let print = new Subject();
     print.subscribe(f=>console.log(f));
@@ -72,6 +73,7 @@ function initiatePipeLine() {
 em.on('CommandPromptEvent',f=>{
     console.log('command Prompt Has Triggred');
     getUserInputNumber();
+    // stdinSource.next(100);
 })
 
 applicationStart();
